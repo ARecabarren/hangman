@@ -1,5 +1,18 @@
 module Display
     
+    def start_menu
+        puts "_________________________________________"
+        puts 'Welcome to Hangman'
+        puts 'Insert 1 to start a new game'
+        puts 'Insert 2 to load a saved game'
+    end
+
+    def wrong_input
+        puts 'Invalid choice'
+        puts 'Insert 1 to start a new game'
+        puts 'Insert 2 to load a saved game'
+    end
+    
     def welcome
         puts "_________________________________________"
         puts "Let's get started"
@@ -24,6 +37,21 @@ module Display
     def display_guesses
         puts "_________________________________________"
         puts "Previous guesses: #{@guesses.join(', ')}"
+    end
+
+    def guess_or_save
+        puts "Guess a letter"
+        puts "Or insert 'save game' to continue later"
+    end
+
+    def get_username
+        puts "Write your username or an alias"
+    end
+
+    def game_saved
+        puts ""
+        puts "Game saved"
+        puts "See you soon"
     end
 end
      
