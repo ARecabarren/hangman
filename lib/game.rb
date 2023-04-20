@@ -1,15 +1,33 @@
 require 'pry-byebug'
 require_relative 'display.rb'
-
+require_relative 'save_game.rb'
 class Game
     include Display
+    include Manage_games
+
+
+
     def initialize
-        @secret_word = pick_random_word
-        @output = set_output
-        @max_attemps = @secret_word.length + 3
-        @attemp = 0
-        @guesses = []
-        run_game
+        start_menu
+        @user_choice = get_start_input
+
+        if @user_choice == '1'
+            @secret_word = pick_random_word
+            @output = set_output
+            @max_attemps = @secret_word.length + 3
+            @attemp = 0
+            @guesses = []
+            run_game
+        elsif @user_choice == '2'
+            data = load_game
+            @secret_word = data["secret_word"]
+            @output = data["output"]
+            @attemp = data["attemp"]
+            @guesses = data["guesses"]
+            @max_attemps = @secret_word.length + 3
+            run_game
+        end
+        
     end
 
     def pick_random_word
@@ -20,10 +38,13 @@ class Game
     def get_a_guess
         correct_guess = false
         until correct_guess
-            puts "Guess a letter:"
+            guess_or_save
             guess = gets().chomp.downcase
             if guess.match?(/[a-zA-Z]/) && guess.length == 1 && !guess.match?(/\d/)
                 correct_guess = true
+            elsif guess == 'save game'
+                correct_guess = true
+                # save_game
             else
                 puts "Invalid guess. Please enter a single letter that is not a number."
             end
@@ -66,7 +87,18 @@ class Game
         end
     end
 
-
+    def get_start_input
+        correct_start_input = false
+        until correct_start_input
+            user_input = gets.chomp
+            if user_input.match?(/\d{1}/) && (user_input == '1' || user_input == '2')
+                correct_start_input = true
+            else
+                wrong_input
+            end
+        end
+        user_input
+    end
 
     def run_game
         welcome
@@ -74,12 +106,23 @@ class Game
             display_guesses unless @guesses.empty?
             puts "Attemp ##{@attemp} : #{@output}"
             @guess = get_a_guess
+
+            if @guess == 'save game'
+                save_game
+                break
+            end
+
             @matches = compare_guess
             update_guesses
             @output = update_output
             @attemp += 1 unless @secret_word.include?(@guess)
         end
-        check_final_status
+
+        if @guess == 'save game'
+            game_saved
+        else
+            check_final_status
+        end
 
     end
 
